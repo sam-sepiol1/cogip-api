@@ -1,0 +1,10 @@
+# Webtorm files
+.idea
+
+# VSCode files
+
+# Environment variables
+.env
+
+# Node modules
+node_modules
