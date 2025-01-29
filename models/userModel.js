@@ -1,3 +1,4 @@
+import connexion from "../database-config.js";
 
 
 const getAllUsers = async (req, res) => {
