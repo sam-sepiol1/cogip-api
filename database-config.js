@@ -19,21 +19,21 @@ async function createDatabase() {
 
         await connexion.query(`USE \`${databaseName}\``);
 
-        await connexion.query(`CREATE TABLE roles (
+        await connexion.query(`CREATE TABLE IF NOT EXISTS roles (
                        id INT AUTO_INCREMENT PRIMARY KEY,
                        name VARCHAR(255) NOT NULL,
                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         );`);
 
-        await connexion.query(`CREATE TABLE permissions (
+        await connexion.query(`CREATE TABLE IF NOT EXISTS permissions (
                              id INT AUTO_INCREMENT PRIMARY KEY,
                              name VARCHAR(255) NOT NULL,
                              created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                              updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         );`);
 
-        await connexion.query(`CREATE TABLE roles_permissions (
+        await connexion.query(`CREATE TABLE IF NOT EXISTS roles_permissions (
                                    id INT AUTO_INCREMENT PRIMARY KEY,
                                    permission_id INT NOT NULL,
                                    role_id INT NOT NULL,
@@ -41,7 +41,7 @@ async function createDatabase() {
                                    FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
         );`);
 
-        await connexion.query(`CREATE TABLE users (
+        await connexion.query(`CREATE TABLE IF NOT EXISTS users (
                        id INT AUTO_INCREMENT PRIMARY KEY,
                        first_name VARCHAR(255) NOT NULL,
                        last_name VARCHAR(255) NOT NULL,
@@ -53,14 +53,14 @@ async function createDatabase() {
                        FOREIGN KEY (role_id) REFERENCES roles(id) ON DELETE CASCADE
         );`);
 
-        await connexion.query(`CREATE TABLE types (
+        await connexion.query(`CREATE TABLE IF NOT EXISTS types (
                        id INT AUTO_INCREMENT PRIMARY KEY,
                        name VARCHAR(255) NOT NULL,
                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         );`);
 
-        await connexion.query(`CREATE TABLE companies (
+        await connexion.query(`CREATE TABLE IF NOT EXISTS companies (
                            id INT AUTO_INCREMENT PRIMARY KEY,
                            name VARCHAR(255) NOT NULL,
                            type_id INT NOT NULL,
@@ -71,7 +71,7 @@ async function createDatabase() {
                            FOREIGN KEY (type_id) REFERENCES types(id) ON DELETE CASCADE
         );`);
 
-        await connexion.query(`CREATE TABLE invoices (
+        await connexion.query(`CREATE TABLE IF NOT EXISTS invoices (
                           id INT AUTO_INCREMENT PRIMARY KEY,
                           ref VARCHAR(255) NOT NULL,
                           id_company INT NOT NULL,
@@ -80,7 +80,7 @@ async function createDatabase() {
                           FOREIGN KEY (id_company) REFERENCES companies(id) ON DELETE CASCADE
         );`);
 
-        await connexion.query(`CREATE TABLE contacts (
+        await connexion.query(`CREATE TABLE IF NOT EXISTS contacts (
             id INT AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             company_id INT NOT NULL,
