@@ -15,3 +15,7 @@ app.get("/", (req, res) => {
     res.status(200).send("Server is running");
 });
 
+app.use('/api', userRoutes);
+app.use('/api', authenticationRoutes);
+app.use('/api', invoiceRoutes);
+app.use('/api', companyRoutes);
