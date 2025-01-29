@@ -1,7 +1,6 @@
 import mysql from 'mysql2/promise';
 import dotenv from "dotenv";
 
-
 dotenv.config();
 
 async function createDatabase() {
@@ -91,6 +90,9 @@ async function createDatabase() {
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
         );`);
+
+        console.log(`Base de données '${databaseName}' créée avec succès`);
+        return connexion;
 
     } catch (error) {
         console.error('Erreur lors de la création de la base de données :', error);
