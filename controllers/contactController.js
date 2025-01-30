@@ -1,9 +1,4 @@
-import {
-    getAllContacts,
-    createContact,
-    editContact,
-    deleteContact
-} from "../models/contactModel.js";
+import { getAllContacts, createContact, editContact, deleteContact } from "../models/contactModel.js";
 
 export const fetchContacts = async (req, res) => {
     try {
@@ -57,7 +52,7 @@ export const saveContact = async (req, res) => {
         const contactId = await createContact({ name, company_id, email, phone });
 
         res.status(201).json({
-            message: "Company created successfully",
+            message: "Contact created successfully",
             contactId: contactId
         });
     } catch (error) {

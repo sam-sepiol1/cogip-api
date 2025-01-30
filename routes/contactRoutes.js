@@ -1,10 +1,5 @@
 import express from "express";
-import {
-    saveContact,
-    fetchContacts,
-    updateContact,
-    removeContact,
-} from "../controllers/contactController.js";
+import { saveContact, fetchContacts, updateContact, removeContact } from "../controllers/contactController.js";
 
 const router = express.Router();
 

@@ -11,7 +11,7 @@ export const getAllContacts = async () => {
 
 export const deleteContact = async (id) => {
     try {
-        const [result] = await connexion.query('DELETE FROM contact WHERE id = ?', [id]);
+        const [result] = await connexion.query('DELETE FROM contacts WHERE id = ?', [id]);
         return result.affectedRows > 0;
     } catch (error) {
         throw new Error(error.message);
