@@ -4,9 +4,9 @@ import { createRole, deleteRole, getRolesForUser, updateRole } from "../controll
 
 const router = express.Router();
 
-router.get('/roles', getRolesForUser)
-router.put('/roles:id', updateRole)
+router.get('/roles/:userId', getRolesForUser)
+router.put('/roles/:id', updateRole)
 router.post('/roles', createRole)
-router.delete('/roles:id', deleteRole)
+router.delete('/roles/:id', deleteRole)
 
 export default router;
