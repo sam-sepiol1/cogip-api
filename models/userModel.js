@@ -1,6 +1,5 @@
 import connexion from "../database-config.js";
 
-
 const getAllUsers = async (req, res) => {
     try {
         const allUsers = await connexion.query('SELECT * FROM users');

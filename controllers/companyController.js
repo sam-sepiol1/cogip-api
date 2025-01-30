@@ -1,4 +1,4 @@
-import { getAllCompanies, removeCompany, updateCompany, createCompany} from "../models/companyModel.js";
+import { getAllCompanies, removeCompany, updateCompany, createCompany } from "../models/companyModel.js";
 
 export const getCompanies = async (req, res) => {
     try {

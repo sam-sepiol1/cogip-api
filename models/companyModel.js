@@ -1,6 +1,5 @@
 import connexion from "../database-config.js";
 
-
 const getAllCompanies = async () => {
     try {
         const [companies] = await connexion.query('SELECT * FROM companies');
@@ -23,7 +22,7 @@ const updateCompany = async (id, { name, type_id, country, tva }) => {
     try {
         const [result] = await connexion.query(
             `UPDATE companies 
-             SET name = ?, type_id = ?, country = ?, tva = ?, updated_at = NOW() 
+             SET name = ?, type_id = ?, country = ?, tva = ? 
              WHERE id = ?`,
             [name, type_id, country, tva, id]
         );
@@ -37,8 +36,8 @@ const updateCompany = async (id, { name, type_id, country, tva }) => {
 const createCompany = async ({ name, type_id, country, tva }) => {
     try {
         const [result] = await connexion.query(
-            `INSERT INTO companies (name, type_id, country, tva, created_at, updated_at) 
-             VALUES (?, ?, ?, ?, NOW(), NOW())`,
+            `INSERT INTO companies (name, type_id, country, tva) 
+             VALUES (?, ?, ?, ?`,
             [name, type_id, country, tva]
         );
 
