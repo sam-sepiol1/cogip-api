@@ -1,4 +1,4 @@
-import {getInvoices, removeInvoice, updateInvoice, createInvoice} from '../models/invoiceModel.js'
+import {getInvoices, removeInvoice, updateInvoice, createInvoice, getInvoiceById} from '../models/invoiceModel.js'
 
 export const getAllInvoices = async (req, res) => {
     try {
@@ -8,6 +8,21 @@ export const getAllInvoices = async (req, res) => {
             return res.status(500).json({message:"No invoices found"});
         }
         res.status(200).json(invoices);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const getOneInvoice = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const invoice = await getInvoiceById(id);
+
+        if (!invoice) {
+            return res.status(500).json({message:"No invoice found"});
+        }
+        res.status(200).json(invoice);
     } catch (error) {
         res.status(500).json({message: error.message});
     }
