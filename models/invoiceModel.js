@@ -9,6 +9,15 @@ const getInvoices = async () => {
     }
 };
 
+const getInvoiceById = async (id) => {
+    try {
+        const [result] = await connexion.query('SELECT * FROM invoices WHERE id = ?', id);
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 const removeInvoice = async (id) => {
     try {
         const [result] = await connexion.query('DELETE FROM invoices WHERE id = ?', [id]);
@@ -43,5 +52,5 @@ const createInvoice = async ({ref, id_company}) => {
     }
 }
 
-export { getInvoices, removeInvoice, updateInvoice, createInvoice };
+export { getInvoices, removeInvoice, updateInvoice, createInvoice, getInvoiceById };
 
