@@ -1,6 +1,7 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import companyRoutes from './routes/companyRoutes.js';
+import invoiceRoutes from './routes/invoiceRoutes.js';
 
 const app = express();
 
@@ -18,5 +19,5 @@ app.get("/", (req, res) => {
 
 //app.use('/api', userRoutes);
 //app.use('/api', authenticationRoutes);
-//app.use('/api', invoiceRoutes);
+app.use('/api', invoiceRoutes);
 app.use('/api', companyRoutes);
