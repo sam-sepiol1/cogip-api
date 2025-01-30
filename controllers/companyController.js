@@ -1,4 +1,4 @@
-import { getAllCompanies, removeCompany, updateCompany, createCompany } from "../models/companyModel.js";
+import {getAllCompanies, removeCompany, updateCompany, createCompany, getCompanyById} from "../models/companyModel.js";
 
 export const getCompanies = async (req, res) => {
     try {
@@ -8,6 +8,20 @@ export const getCompanies = async (req, res) => {
             return res.status(500).json({ message: "No companies found." });
         }
         res.status(200).json(companies);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const getOneCompany = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const company = await getCompanyById(id);
+
+        if (!company) {
+            return res.status(500).json({message: "No company found."});
+        }
+        res.status(200).json(company);
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
@@ -28,7 +42,7 @@ export const deleteCompany = async (req, res) => {
     }
 };
 
-export const updateCompanies = async (req, res) => {
+export const updateOneCompany = async (req, res) => {
     try {
         const { id } = req.params;
         const { name, type_id, country, tva } = req.body;
@@ -45,7 +59,7 @@ export const updateCompanies = async (req, res) => {
     }
 };
 
-export const createCompanies = async (req, res) => {
+export const createOneCompany = async (req, res) => {
     try {
         const { name, type_id, country, tva } = req.body;
 
