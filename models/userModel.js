@@ -1,7 +1,7 @@
 import connexion from "../database-config.js";
 import Bcrypt from "bcrypt";
 
-const getAllUsers = async (req, res) => {
+export const getAllUsers = async () => {
     try {
         const [allUsers] = await connexion.query('SELECT * FROM users');
         return allUsers;
