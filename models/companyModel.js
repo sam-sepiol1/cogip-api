@@ -1,6 +1,6 @@
 import connexion from "../database-config.js";
 
-const getAllCompanies = async () => {
+ export const getAllCompanies = async () => {
     try {
         const [companies] = await connexion.query('SELECT * FROM companies');
         return companies;
@@ -9,7 +9,16 @@ const getAllCompanies = async () => {
     }
 };
 
-const removeCompany = async (id) => {
+ export const getCompanyById = async (id) => {
+    try {
+        const [result] = await connexion.query('SELECT * FROM companies WHERE id = ?', [id]);
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+export const removeCompany = async (id) => {
     try {
         const [result] = await connexion.query('DELETE FROM companies WHERE id = ?', [id]);
         return result.affectedRows > 0;
@@ -18,7 +27,7 @@ const removeCompany = async (id) => {
     }
 };
 
-const updateCompany = async (id, { name, type_id, country, tva }) => {
+export const updateCompany = async (id, { name, type_id, country, tva }) => {
     try {
         const [result] = await connexion.query(
             `UPDATE companies 
@@ -26,25 +35,21 @@ const updateCompany = async (id, { name, type_id, country, tva }) => {
              WHERE id = ?`,
             [name, type_id, country, tva, id]
         );
-
         return result.affectedRows > 0;
     } catch (error) {
         throw new Error(error.message);
     }
 };
 
-const createCompany = async ({ name, type_id, country, tva }) => {
+export const createCompany = async ({ name, type_id, country, tva }) => {
     try {
         const [result] = await connexion.query(
             `INSERT INTO companies (name, type_id, country, tva) 
-             VALUES (?, ?, ?, ?`,
+             VALUES (?, ?, ?, ?)`,
             [name, type_id, country, tva]
         );
-
         return result.insertId;
     } catch (error) {
         throw new Error(error.message);
     }
 };
-
-export { getAllCompanies, removeCompany, updateCompany, createCompany };
