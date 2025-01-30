@@ -6,6 +6,7 @@ import companyRoutes from './routes/companyRoutes.js';
 import invoiceRoutes from './routes/invoiceRoutes.js';
 import contactRoutes from "./routes/contactRoutes.js";
 import rolesRoutes from "./routes/rolesRoutes.js";
+import permissionsRoutes from "./routes/permissionsRoutes.js";
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.get("/", (req, res) => {
 
 app.use('/api', userRoutes);
 app.use('/api', authentificationRoutes);
+app.use('/api', permissionsRoutes);
 app.use('/api', invoiceRoutes);
 app.use('/api', companyRoutes);
 app.use('/api', contactRoutes);
