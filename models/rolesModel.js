@@ -2,8 +2,6 @@ import connexion from '../database-config.js'
 
 export const getRolesByUserId = async (userId) => {
     try {
-        if (!userId) throw new Error("User ID is required to get roles.");
-
         const [roles] = await connexion.query(
             `SELECT r.* 
              FROM roles r
