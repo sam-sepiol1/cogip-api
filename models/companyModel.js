@@ -1,6 +1,6 @@
 import connexion from "../database-config.js";
 
-const getAllCompanies = async () => {
+ export const getAllCompanies = async () => {
     try {
         const [companies] = await connexion.query('SELECT * FROM companies');
         return companies;
@@ -9,7 +9,7 @@ const getAllCompanies = async () => {
     }
 };
 
-const getCompanyById = async (id) => {
+ export const getCompanyById = async (id) => {
     try {
         const [result] = await connexion.query('SELECT * FROM companies WHERE id = ?', [id]);
         return result;
@@ -18,7 +18,7 @@ const getCompanyById = async (id) => {
     }
 };
 
-const removeCompany = async (id) => {
+export const removeCompany = async (id) => {
     try {
         const [result] = await connexion.query('DELETE FROM companies WHERE id = ?', [id]);
         return result.affectedRows > 0;
@@ -27,7 +27,7 @@ const removeCompany = async (id) => {
     }
 };
 
-const updateCompany = async (id, { name, type_id, country, tva }) => {
+export const updateCompany = async (id, { name, type_id, country, tva }) => {
     try {
         const [result] = await connexion.query(
             `UPDATE companies 
@@ -41,7 +41,7 @@ const updateCompany = async (id, { name, type_id, country, tva }) => {
     }
 };
 
-const createCompany = async ({ name, type_id, country, tva }) => {
+export const createCompany = async ({ name, type_id, country, tva }) => {
     try {
         const [result] = await connexion.query(
             `INSERT INTO companies (name, type_id, country, tva) 
@@ -53,5 +53,3 @@ const createCompany = async ({ name, type_id, country, tva }) => {
         throw new Error(error.message);
     }
 };
-
-export { getAllCompanies, removeCompany, updateCompany, createCompany, getCompanyById };

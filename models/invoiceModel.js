@@ -1,6 +1,6 @@
 import connexion from '../database-config.js';
 
-const getInvoices = async () => {
+export const getInvoices = async () => {
     try {
         const [invoices] = await connexion.query('SELECT * FROM invoices');
         return invoices;
@@ -9,7 +9,7 @@ const getInvoices = async () => {
     }
 };
 
-const getInvoiceById = async (id) => {
+export const getInvoiceById = async (id) => {
     try {
         const [result] = await connexion.query('SELECT * FROM invoices WHERE id = ?', id);
         return result;
@@ -18,7 +18,7 @@ const getInvoiceById = async (id) => {
     }
 };
 
-const removeInvoice = async (id) => {
+export const removeInvoice = async (id) => {
     try {
         const [result] = await connexion.query('DELETE FROM invoices WHERE id = ?', [id]);
         return result.affectedRows > 0;
@@ -27,7 +27,7 @@ const removeInvoice = async (id) => {
     }
 };
 
-const updateInvoice = async (id, { ref, id_company }) => {
+export const updateInvoice = async (id, { ref, id_company }) => {
     try {
         const [result] = await connexion.query(
             `UPDATE invoices SET ref = ?, id_company = ? WHERE id = ?`,
@@ -39,7 +39,7 @@ const updateInvoice = async (id, { ref, id_company }) => {
     }
 };
 
-const createInvoice = async ({ref, id_company}) => {
+export const createInvoice = async ({ref, id_company}) => {
     try {
         const [result] = await connexion.query(
             `INSERT INTO invoices (ref, id_company)
@@ -50,7 +50,5 @@ const createInvoice = async ({ref, id_company}) => {
     } catch (error) {
         throw new Error(error.message);
     }
-}
-
-export { getInvoices, removeInvoice, updateInvoice, createInvoice, getInvoiceById };
+};
 
