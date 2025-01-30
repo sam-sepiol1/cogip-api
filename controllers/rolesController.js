@@ -22,9 +22,9 @@ export const createRole = async (req, res) => {
 
         const role = await createRoles({ name });
 
-        res.status(201).send(role);
+        res.status(200).json(role);
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json({message: error.message});
     }
 };
 
@@ -34,9 +34,9 @@ export const updateRole = async (req, res) => {
         const { id } = req.params;
 
         const updated = await updateRoles(id, { name });
-        res.status(200).send(updated);
+        res.status(200).json(updated);
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json(error);
     }
 };
 
@@ -47,10 +47,10 @@ export const deleteRole = async (req, res) => {
         const deleted = await removeRole(id);
 
         if (!deleted) {
-            return res.status(500).send({message: 'No roles found'});
+            return res.status(500).json({message: 'No roles found'});
         }
-        res.status(200).send(deleted);
+        res.status(200).json(deleted);
     } catch (error) {
-        res.status(500).send(error);
+        res.status(500).json(error);
     }
 };
