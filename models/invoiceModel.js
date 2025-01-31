@@ -23,7 +23,11 @@ export const getPaginatedInvoices = async (limit, offset) => {
         const parsedLimit = parseInt(limit, 10);
         const parsedOffset = parseInt(offset, 10);
 
-        const [result] = await connexion.query(`SELECT * FROM invoices ORDER BY created_at ASC LIMIT ${parsedLimit} OFFSET ${parsedOffset}`);
+        const [result] = await connexion.query(`SELECT i.ref, i.created_at, c.name as company
+                                                FROM invoices AS i 
+                                                JOIN companies AS c ON i.id_company = c.id
+                                                ORDER BY i.created_at ASC 
+                                                LIMIT ${parsedLimit} OFFSET ${parsedOffset}`);
         return result;
     } catch (error) {
         throw new Error(error.message);
