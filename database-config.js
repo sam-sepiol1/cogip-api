@@ -71,14 +71,17 @@ async function createDatabase() {
                            FOREIGN KEY (type_id) REFERENCES types(id) ON DELETE CASCADE
         );`);
 
-        await connexion.query(`CREATE TABLE IF NOT EXISTS invoices (
-                          id INT AUTO_INCREMENT PRIMARY KEY,
-                          ref VARCHAR(255) NOT NULL,
-                          id_company INT NOT NULL,
-                          created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                          updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                          FOREIGN KEY (id_company) REFERENCES companies(id) ON DELETE CASCADE
-        );`);
+        await connexion.query(`
+            CREATE TABLE IF NOT EXISTS invoices (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                ref VARCHAR(255) NOT NULL,
+                id_company INT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                due_date DATETIME NOT NULL,
+                FOREIGN KEY (id_company) REFERENCES companies(id) ON DELETE CASCADE
+                )
+        `);
 
         await connexion.query(`CREATE TABLE IF NOT EXISTS contacts (
             id INT AUTO_INCREMENT PRIMARY KEY,
@@ -90,6 +93,65 @@ async function createDatabase() {
             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (company_id) REFERENCES companies(id) ON DELETE CASCADE
         );`);
+
+        await connexion.query(`
+            INSERT INTO roles (name) VALUES 
+            ('Admin'), 
+            ('Manager'), 
+            ('Employé'), 
+            ('Client'), 
+            ('Comptable')
+        `);
+
+        await connexion.query(`
+            INSERT INTO permissions (name) VALUES 
+            ('Créer utilisateur'), 
+            ('Supprimer utilisateur'), 
+            ('Modifier entreprise'), 
+            ('Gérer factures'), 
+            ('Consulter rapports')
+        `);
+
+        await connexion.query(`
+            INSERT INTO roles_permissions (permission_id, role_id) VALUES 
+            (1, 1), (2, 1), (3, 2), (4, 3), (5, 4)
+        `);
+
+        await connexion.query(`
+            INSERT INTO types (name) VALUES 
+            ('SARL'), 
+            ('SA'), 
+            ('Auto-entrepreneur'), 
+            ('Association'), 
+            ('Startup')
+        `);
+
+        await connexion.query(`
+            INSERT INTO companies (name, type_id, country, tva) VALUES 
+            ('TechCorp', 1, 'Belgium', 'BE1234567890'), 
+            ('GreenEnergy', 2, 'France', 'FR9876543210'), 
+            ('Foodies', 3, 'Germany', 'DE1122334455'), 
+            ('BuildIt', 4, 'Spain', 'ES5566778899'), 
+            ('AI Solutions', 5, 'Italy', 'IT6655443322')
+        `);
+
+        await connexion.query(`
+            INSERT INTO contacts (name, company_id, email, phone) VALUES 
+            ('Alice Dupont', 1, 'alice@techcorp.com', '+32471234567'), 
+            ('Jean Martin', 2, 'jean@greenenergy.com', '+33698765432'), 
+            ('Maria Schmidt', 3, 'maria@foodies.de', '+491765432198'), 
+            ('Carlos Rodriguez', 4, 'carlos@buildit.es', '+34612345678'), 
+            ('Luigi Verdi', 5, 'luigi@aisolutions.it', '+393987654321')
+        `);
+
+        await connexion.query(`
+            INSERT INTO invoices (ref, id_company, due_date) VALUES 
+            ('INV-1001', 1, DATE_ADD(NOW(), INTERVAL 2 YEAR)), 
+            ('INV-1002', 2, DATE_ADD(NOW(), INTERVAL 2 YEAR)), 
+            ('INV-1003', 3, DATE_ADD(NOW(), INTERVAL 2 YEAR)), 
+            ('INV-1004', 4, DATE_ADD(NOW(), INTERVAL 2 YEAR)), 
+            ('INV-1005', 5, DATE_ADD(NOW(), INTERVAL 2 YEAR))
+        `);
 
         console.log(`Base de données '${databaseName}' créée avec succès`);
         return connexion;
