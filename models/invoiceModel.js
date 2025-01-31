@@ -23,7 +23,7 @@ export const getPaginatedInvoices = async (limit, offset) => {
         const parsedLimit = parseInt(limit, 10);
         const parsedOffset = parseInt(offset, 10);
 
-        const [result] = await connexion.query(`SELECT i.ref, i.created_at, c.name as company
+        const [result] = await connexion.query(`SELECT i.ref,i.due_date, i.created_at, c.name as company
                                                 FROM invoices AS i 
                                                 JOIN companies AS c ON i.id_company = c.id
                                                 ORDER BY i.created_at ASC 
@@ -55,11 +55,11 @@ export const updateInvoice = async (id, { ref, id_company }) => {
     }
 };
 
-export const createInvoice = async ({ref, id_company}) => {
+export const createInvoice = async ({ ref, id_company }) => {
     try {
         const [result] = await connexion.query(
-            `INSERT INTO invoices (ref, id_company)
-            VALUES (?, ?)`,
+            `INSERT INTO invoices (ref, id_company, due_date)
+             VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 2 YEAR))`,
             [ref, id_company]
         );
         return result.insertId;
