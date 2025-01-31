@@ -9,6 +9,18 @@ export const getAllContacts = async () => {
     }
 };
 
+export const getPaginatedContacts = async (limit, offset) => {
+    try {
+        const parsedLimit = parseInt(limit, 10);
+        const parsedOffset = parseInt(offset, 10);
+
+        const [result] = await connexion.query(`SELECT * FROM contacts ORDER BY name ASC LIMIT ${parsedLimit} OFFSET ${parsedOffset}`);
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
 export const deleteContact = async (id) => {
     try {
         const [result] = await connexion.query('DELETE FROM contacts WHERE id = ?', [id]);

@@ -1,4 +1,11 @@
-import { getAllContacts, createContact, editContact, deleteContact } from "../models/contactModel.js";
+import {
+    getAllContacts,
+    createContact,
+    editContact,
+    deleteContact,
+    getPaginatedContacts
+} from "../models/contactModel.js";
+import {getPaginatedCompanies} from "../models/companyModel.js";
 
 export const fetchContacts = async (req, res) => {
     try {
@@ -12,6 +19,22 @@ export const fetchContacts = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getPaginatedSortedContacts = async (req, res) => {
+    try {
+        const { limit, offset } = req.params;
+
+        const datas = await getPaginatedContacts(limit, offset);
+
+        if (!datas.length) {
+            return res.status(500).json({message:"No contacts found"});
+        }
+
+        res.status(200).json(datas);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
 
 export const removeContact = async (req, res) => {
     try {
