@@ -1,4 +1,11 @@
-import { getInvoices, removeInvoice, updateInvoice, createInvoice, getInvoiceById } from '../models/invoiceModel.js'
+import {
+    getInvoices,
+    removeInvoice,
+    updateInvoice,
+    createInvoice,
+    getInvoiceById,
+    getPaginatedInvoices
+} from '../models/invoiceModel.js'
 
 export const getAllInvoices = async (req, res) => {
     try {
@@ -27,6 +34,22 @@ export const getOneInvoice = async (req, res) => {
         res.status(500).json({message: error.message});
     }
 };
+
+export const getPaginatedSortedInvoices = async (req, res) => {
+    try {
+        const { limit, offset } = req.params;
+
+        const datas = await getPaginatedInvoices(limit, offset);
+
+        if (!datas.length) {
+            return res.status(500).json({message:"No invoices found"});
+        }
+
+        res.status(200).json(datas);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
 
 export const deleteInvoice = async (req, res) => {
     try {

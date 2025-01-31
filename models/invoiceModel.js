@@ -18,6 +18,18 @@ export const getInvoiceById = async (id) => {
     }
 };
 
+export const getPaginatedInvoices = async (limit, offset) => {
+    try {
+        const parsedLimit = parseInt(limit, 10);
+        const parsedOffset = parseInt(offset, 10);
+
+        const [result] = await connexion.query(`SELECT * FROM invoices ORDER BY created_at ASC LIMIT ${parsedLimit} OFFSET ${parsedOffset}`);
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
 export const removeInvoice = async (id) => {
     try {
         const [result] = await connexion.query('DELETE FROM invoices WHERE id = ?', [id]);
