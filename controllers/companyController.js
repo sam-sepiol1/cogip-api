@@ -1,4 +1,12 @@
-import { getAllCompanies, removeCompany, updateCompany, createCompany, getCompanyById } from "../models/companyModel.js";
+import {
+    getAllCompanies,
+    removeCompany,
+    updateCompany,
+    createCompany,
+    getCompanyById,
+    getPaginatedCompanies
+} from "../models/companyModel.js";
+import {getPaginatedInvoices} from "../models/invoiceModel.js";
 
 export const getCompanies = async (req, res) => {
     try {
@@ -26,6 +34,22 @@ export const getOneCompany = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getPaginatedSortedCompanies = async (req, res) => {
+    try {
+        const { limit, offset } = req.params;
+
+        const datas = await getPaginatedCompanies(limit, offset);
+
+        if (!datas.length) {
+            return res.status(500).json({message:"No companies found"});
+        }
+
+        res.status(200).json(datas);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
 
 export const deleteCompany = async (req, res) => {
     try {

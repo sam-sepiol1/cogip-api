@@ -18,6 +18,18 @@ import connexion from "../database-config.js";
     }
 };
 
+export const getPaginatedCompanies = async (limit, offset) => {
+    try {
+        const parsedLimit = parseInt(limit, 10);
+        const parsedOffset = parseInt(offset, 10);
+
+        const [result] = await connexion.query(`SELECT * FROM companies ORDER BY name ASC LIMIT ${parsedLimit} OFFSET ${parsedOffset}`);
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
 export const removeCompany = async (id) => {
     try {
         const [result] = await connexion.query('DELETE FROM companies WHERE id = ?', [id]);
