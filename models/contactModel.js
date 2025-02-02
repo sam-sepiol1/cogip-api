@@ -9,7 +9,16 @@ export const getAllContacts = async () => {
     }
 };
 
-export const getPaginatedContacts = async (limit, offset) => {
+export const getContactByName = async (name) => {
+    try {
+        const [result] = await connexion.query('SELECT * FROM contacts WHERE name = ?', [name]);
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
+export const sortAscContacts = async (limit, offset) => {
     try {
         const parsedLimit = parseInt(limit, 10);
         const parsedOffset = parseInt(offset, 10);
@@ -18,6 +27,22 @@ export const getPaginatedContacts = async (limit, offset) => {
                                                 FROM contacts AS c
                                                 JOIN companies AS co ON c.company_id = co.id
                                                 ORDER BY c.name ASC
+                                                LIMIT ${parsedLimit} OFFSET ${parsedOffset};`);
+        return result;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
+export const sortDescContacts = async (limit, offset) => {
+    try {
+        const parsedLimit = parseInt(limit, 10);
+        const parsedOffset = parseInt(offset, 10);
+
+        const [result] = await connexion.query(`SELECT c.name, c.phone, c.email, co.name AS company
+                                                FROM contacts AS c
+                                                JOIN companies AS co ON c.company_id = co.id
+                                                ORDER BY c.name DESC
                                                 LIMIT ${parsedLimit} OFFSET ${parsedOffset};`);
         return result;
     } catch (error) {

@@ -4,9 +4,8 @@ import {
     updateCompany,
     createCompany,
     getCompanyById,
-    getPaginatedCompanies
+    getPaginatedCompanies, getCompanyByName, getSortedCompanies
 } from "../models/companyModel.js";
-import {getPaginatedInvoices} from "../models/invoiceModel.js";
 
 export const getCompanies = async (req, res) => {
     try {
@@ -35,11 +34,41 @@ export const getOneCompany = async (req, res) => {
     }
 };
 
-export const getPaginatedSortedCompanies = async (req, res) => {
+export const searchCompany = async (req, res) => {
+    try {
+        const { name } = req.params;
+        const company = await getCompanyByName(name);
+
+        if (!company) {
+            return res.status(500).json({message: "No company found."});
+        }
+        res.status(200).json(company);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getAscSortedCompanies = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
         const datas = await getPaginatedCompanies(limit, offset);
+
+        if (!datas.length) {
+            return res.status(500).json({message:"No companies found"});
+        }
+
+        res.status(200).json(datas);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const getDescSortedCompanies = async (req, res) => {
+    try {
+        const { limit, offset } = req.params;
+
+        const datas = await getSortedCompanies(limit, offset);
 
         if (!datas.length) {
             return res.status(500).json({message:"No companies found"});
