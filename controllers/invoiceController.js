@@ -4,7 +4,7 @@ import {
     updateInvoice,
     createInvoice,
     getInvoiceById,
-    getPaginatedInvoices
+    getPaginatedInvoices, sortedAscByDueDateInvoices, sortedDescByDueDateInvoices
 } from '../models/invoiceModel.js'
 
 export const getAllInvoices = async (req, res) => {
@@ -49,7 +49,39 @@ export const getPaginatedSortedInvoices = async (req, res) => {
     } catch (error) {
         res.status(500).json({message: error.message});
     }
-}
+};
+
+export const sortAscDueDateInvoices = async (req, res) => {
+    try {
+        const { limit, offset } = req.params;
+
+        const datas = await sortedAscByDueDateInvoices(limit, offset);
+
+        if (!datas.length) {
+            return res.status(500).json({message:"No invoices found"});
+        }
+
+        res.status(200).json(datas);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const sortDescDueDateInvoices = async (req, res) => {
+    try {
+        const { limit, offset } = req.params;
+
+        const datas = await sortedDescByDueDateInvoices(limit, offset);
+
+        if (!datas.length) {
+            return res.status(500).json({message:"No invoices found"});
+        }
+
+        res.status(200).json(datas);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
 
 export const deleteInvoice = async (req, res) => {
     try {
