@@ -4,9 +4,11 @@ import {
     updateCompany,
     createCompany,
     getCompanyById,
-    getPaginatedCompanies
+    getCompanyByName,
+    getAscSortedCompanies,
+    getDescSortedCompanies,
+    countAllCompanies
 } from "../models/companyModel.js";
-import {getPaginatedInvoices} from "../models/invoiceModel.js";
 
 export const getCompanies = async (req, res) => {
     try {
@@ -21,7 +23,21 @@ export const getCompanies = async (req, res) => {
     }
 };
 
-export const getOneCompany = async (req, res) => {
+export const countCompanies = async (req, res) => {
+    try {
+        const count = await countAllCompanies();
+
+        if (count === null) {
+            return res.status(500).json({ message: "Failed to count companies." });
+        }
+
+        res.status(200).json({ totalCompanies: count });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const searchCompanyById = async (req, res) => {
     try {
         const { id } = req.params;
         const company = await getCompanyById(id);
@@ -35,11 +51,41 @@ export const getOneCompany = async (req, res) => {
     }
 };
 
-export const getPaginatedSortedCompanies = async (req, res) => {
+export const searchCompanyByName = async (req, res) => {
+    try {
+        const { name } = req.params;
+        const company = await getCompanyByName(name);
+
+        if (!company) {
+            return res.status(500).json({message: "No company found."});
+        }
+        res.status(200).json(company);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getCompaniesSortedByNameASC = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
-        const datas = await getPaginatedCompanies(limit, offset);
+        const datas = await getAscSortedCompanies(limit, offset);
+
+        if (!datas.length) {
+            return res.status(500).json({message:"No companies found"});
+        }
+
+        res.status(200).json(datas);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+};
+
+export const getCompaniesSortedByNameDESC = async (req, res) => {
+    try {
+        const { limit, offset } = req.params;
+
+        const datas = await getDescSortedCompanies(limit, offset);
 
         if (!datas.length) {
             return res.status(500).json({message:"No companies found"});

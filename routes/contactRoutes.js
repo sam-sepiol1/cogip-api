@@ -4,13 +4,16 @@ import {
     fetchContacts,
     updateContact,
     removeContact,
-    getPaginatedSortedContacts
+    getSortedContactsByNameDESC, getSortedContactsByNameASC, searchContactByName, countContacts
 } from "../controllers/contactController.js";
 
 const router = express.Router();
 
 router.get('/contact', fetchContacts);
-router.get('/paginatedContacts/:limit/:offset', getPaginatedSortedContacts);
+router.get('/countContacts', countContacts);
+router.get('/searchContact/:name', searchContactByName)
+router.get('/sortedAscContacts/:limit/:offset', getSortedContactsByNameASC);
+router.get('/sortedDescContacts/:limit/:offset', getSortedContactsByNameDESC);
 router.put('/contact/:id', updateContact);
 router.post('/contact', saveContact);
 router.delete('/contact/:id', removeContact);

@@ -3,9 +3,9 @@ import {
     createContact,
     editContact,
     deleteContact,
-    getPaginatedContacts
+    getPaginatedContacts, getContactByName, sortAscContacts, sortDescContacts, countAllContacts
 } from "../models/contactModel.js";
-import {getPaginatedCompanies} from "../models/companyModel.js";
+import {getCompanyByName, getPaginatedCompanies} from "../models/companyModel.js";
 
 export const fetchContacts = async (req, res) => {
     try {
@@ -20,11 +20,55 @@ export const fetchContacts = async (req, res) => {
     }
 };
 
-export const getPaginatedSortedContacts = async (req, res) => {
+export const countContacts = async (req, res) => {
+    try {
+        const count= await countAllContacts();
+
+        if (count === null) {
+            return res.status(500).json({ message: "Failed to count contacts." });
+        }
+
+        res.status(200).json({ totalContacts: count });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const searchContactByName = async (req, res) => {
+    try {
+        const { name } = req.params;
+        const contact = await getContactByName(name);
+
+        if (!contact) {
+            return res.status(500).json({message: "No contacts found."});
+        }
+        res.status(200).json(contact);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
+
+export const getSortedContactsByNameASC = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
-        const datas = await getPaginatedContacts(limit, offset);
+        const datas = await sortAscContacts(limit, offset);
+
+        if (!datas.length) {
+            return res.status(500).json({message:"No contacts found"});
+        }
+
+        res.status(200).json(datas);
+    } catch (error) {
+        res.status(500).json({message: error.message});
+    }
+}
+
+export const getSortedContactsByNameDESC = async (req, res) => {
+    try {
+        const { limit, offset } = req.params;
+
+        const datas = await sortDescContacts(limit, offset);
 
         if (!datas.length) {
             return res.status(500).json({message:"No contacts found"});
