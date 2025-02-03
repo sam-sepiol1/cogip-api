@@ -3,7 +3,7 @@ import {
     createContact,
     editContact,
     deleteContact,
-    getPaginatedContacts, getContactByName, sortAscContacts, sortDescContacts
+    getPaginatedContacts, getContactByName, sortAscContacts, sortDescContacts, countAllContacts
 } from "../models/contactModel.js";
 import {getCompanyByName, getPaginatedCompanies} from "../models/companyModel.js";
 
@@ -20,7 +20,21 @@ export const fetchContacts = async (req, res) => {
     }
 };
 
-export const searchContact = async (req, res) => {
+export const countContacts = async (req, res) => {
+    try {
+        const count= await countAllContacts();
+
+        if (count === null) {
+            return res.status(500).json({ message: "Failed to count contacts." });
+        }
+
+        res.status(200).json({ totalContacts: count });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const searchContactByName = async (req, res) => {
     try {
         const { name } = req.params;
         const contact = await getContactByName(name);
@@ -34,7 +48,7 @@ export const searchContact = async (req, res) => {
     }
 }
 
-export const sortedAscContacts = async (req, res) => {
+export const getSortedContactsByNameASC = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
@@ -50,7 +64,7 @@ export const sortedAscContacts = async (req, res) => {
     }
 }
 
-export const sortedDescContacts = async (req, res) => {
+export const getSortedContactsByNameDESC = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 

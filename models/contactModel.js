@@ -9,6 +9,15 @@ export const getAllContacts = async () => {
     }
 };
 
+export const countAllContacts = async () => {
+    try {
+        const [contact] = await connexion.query('SELECT COUNT (*) AS Total FROM contacts');
+        return contact[0].total;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+}
+
 export const getContactByName = async (name) => {
     try {
         const [result] = await connexion.query('SELECT * FROM contacts WHERE name = ?', [name]);
