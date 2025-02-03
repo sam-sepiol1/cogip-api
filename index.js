@@ -7,6 +7,7 @@ import invoiceRoutes from './routes/invoiceRoutes.js';
 import contactRoutes from "./routes/contactRoutes.js";
 import rolesRoutes from "./routes/rolesRoutes.js";
 import permissionsRoutes from "./routes/permissionsRoutes.js";
+import { authenticate } from "./controllers/authentificationController.js";
 
 const app = express();
 
@@ -22,10 +23,10 @@ app.get("/", (req, res) => {
     res.status(200).send("Server is running");
 });
 
-app.use('/api', userRoutes);
 app.use('/api', authentificationRoutes);
-app.use('/api', permissionsRoutes);
-app.use('/api', invoiceRoutes);
-app.use('/api', companyRoutes);
-app.use('/api', contactRoutes);
-app.use('/api', rolesRoutes);
+app.use('/api', authenticate, userRoutes);
+app.use('/api', authenticate, permissionsRoutes);
+app.use('/api', authenticate, invoiceRoutes);
+app.use('/api', authenticate, companyRoutes);
+app.use('/api', authenticate, contactRoutes);
+app.use('/api', authenticate, rolesRoutes);

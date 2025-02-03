@@ -12,26 +12,35 @@ export const register = async (first_name, last_name, role_id, email, password) 
         const [createdUser] = await connexion.query('INSERT INTO users (first_name, last_name, role_id, email, password) VALUES (?, ?, ?, ?, ?)', [first_name, last_name, role_id, email, hashedPassword]);
         return createdUser;
     } catch (error) {
-        console.log(error.message);
-        throw error;
+        throw new Error(error.message);
     }
 }
 
 export const login = async (email, password) => {
     try {
         const userExists = await checkIfUserAlreadyExists(email);
-        if (userExists) {
-            throw new Error('User already exists');
+        if (!userExists) {
+            throw new Error('Invalid email or password');
         }
-        // TODO JWT !!
-        return "Coming soon";
+
+        const isMatch = await Bcrypt.compare(password, userExists.password);
+
+        if (isMatch) {
+            return userExists;
+        } else {
+            throw new Error('Invalid credentials');
+        }
     } catch (error) {
-        console.log(error);
-        throw error;
+        throw new Error(error);
     }
 };
 
 const checkIfUserAlreadyExists = async (email) => {
-    const [user] = await connexion.query('SELECT * FROM users WHERE email = ?', [email]);
-    return user.length > 0;
+    const [result] = await connexion.query('SELECT * FROM users WHERE email = ?', [email]);
+
+    if (result.length === 0) {
+        return null;
+    } else {
+        return result[0];
+    }
 }
