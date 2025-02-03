@@ -4,7 +4,10 @@ import {
     updateCompany,
     createCompany,
     getCompanyById,
-    getPaginatedCompanies, getCompanyByName, getSortedCompanies
+    getCompanyByName,
+    getAscSortedCompanies,
+    getDescSortedCompanies,
+    countAllCompanies
 } from "../models/companyModel.js";
 
 export const getCompanies = async (req, res) => {
@@ -20,7 +23,21 @@ export const getCompanies = async (req, res) => {
     }
 };
 
-export const getOneCompany = async (req, res) => {
+export const countCompanies = async (req, res) => {
+    try {
+        const count = await countAllCompanies();
+
+        if (count === null) {
+            return res.status(500).json({ message: "Failed to count companies." });
+        }
+
+        res.status(200).json({ totalCompanies: count });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
+
+export const searchCompanyById = async (req, res) => {
     try {
         const { id } = req.params;
         const company = await getCompanyById(id);
@@ -34,7 +51,7 @@ export const getOneCompany = async (req, res) => {
     }
 };
 
-export const searchCompany = async (req, res) => {
+export const searchCompanyByName = async (req, res) => {
     try {
         const { name } = req.params;
         const company = await getCompanyByName(name);
@@ -48,11 +65,11 @@ export const searchCompany = async (req, res) => {
     }
 }
 
-export const getAscSortedCompanies = async (req, res) => {
+export const getCompaniesSortedByNameASC = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
-        const datas = await getPaginatedCompanies(limit, offset);
+        const datas = await getAscSortedCompanies(limit, offset);
 
         if (!datas.length) {
             return res.status(500).json({message:"No companies found"});
@@ -64,11 +81,11 @@ export const getAscSortedCompanies = async (req, res) => {
     }
 };
 
-export const getDescSortedCompanies = async (req, res) => {
+export const getCompaniesSortedByNameDESC = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
-        const datas = await getSortedCompanies(limit, offset);
+        const datas = await getDescSortedCompanies(limit, offset);
 
         if (!datas.length) {
             return res.status(500).json({message:"No companies found"});

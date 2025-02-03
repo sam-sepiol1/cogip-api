@@ -9,6 +9,15 @@ import connexion from "../database-config.js";
     }
 };
 
+export const countAllCompanies = async () => {
+    try {
+        const [result] = await connexion.query("SELECT COUNT(*) AS total FROM companies");
+        return result[0].total;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
  export const getCompanyById = async (id) => {
     try {
         const [result] = await connexion.query('SELECT * FROM companies WHERE id = ?', [id]);
@@ -27,7 +36,7 @@ import connexion from "../database-config.js";
      }
  };
 
-export const getPaginatedCompanies = async (limit, offset) => {
+export const getAscSortedCompanies = async (limit, offset) => {
     try {
         const parsedLimit = parseInt(limit, 10);
         const parsedOffset = parseInt(offset, 10);
@@ -43,7 +52,7 @@ export const getPaginatedCompanies = async (limit, offset) => {
     }
 }
 
-export const getSortedCompanies = async (limit, offset) => {
+export const getDescSortedCompanies = async (limit, offset) => {
     try {
         const parsedLimit = parseInt(limit, 10);
         const parsedOffset = parseInt(offset, 10);
