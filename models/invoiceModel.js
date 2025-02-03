@@ -9,6 +9,15 @@ export const getInvoices = async () => {
     }
 };
 
+export const countAllInvoices = async () => {
+    try {
+        const [result] = await connexion.query("SELECT COUNT(*) AS total FROM invoices");
+        return result[0].total;
+    } catch (error) {
+        throw new Error(error.message);
+    }
+};
+
 export const getInvoiceById = async (id) => {
     try {
         const [result] = await connexion.query('SELECT * FROM invoices WHERE id = ?', id);

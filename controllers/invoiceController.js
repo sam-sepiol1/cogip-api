@@ -4,7 +4,7 @@ import {
     updateInvoice,
     createInvoice,
     getInvoiceById,
-    getPaginatedInvoices, sortedAscByDueDateInvoices, sortedDescByDueDateInvoices
+    getPaginatedInvoices, sortedAscByDueDateInvoices, sortedDescByDueDateInvoices, countAllInvoices
 } from '../models/invoiceModel.js'
 
 export const getAllInvoices = async (req, res) => {
@@ -17,6 +17,20 @@ export const getAllInvoices = async (req, res) => {
         res.status(200).json(invoices);
     } catch (error) {
         res.status(500).json({message: error.message});
+    }
+};
+
+export const countInvoices = async (req, res) => {
+    try {
+        const count = await countAllInvoices();
+
+        if (count === null) {
+            return res.status(500).json({ message: "Failed to count invoices." });
+        }
+
+        res.status(200).json({ totalInvoices: count });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
 };
 
