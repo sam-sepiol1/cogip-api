@@ -23,7 +23,11 @@ export const getPaginatedCompanies = async (limit, offset) => {
         const parsedLimit = parseInt(limit, 10);
         const parsedOffset = parseInt(offset, 10);
 
-        const [result] = await connexion.query(`SELECT * FROM companies ORDER BY name ASC LIMIT ${parsedLimit} OFFSET ${parsedOffset}`);
+        const [result] = await connexion.query(`SELECT c.name, c.tva, c.country, t.name AS type, c.created_at
+                                                FROM companies AS c
+                                                JOIN types AS t ON c.type_id = t.id
+                                                ORDER BY c.name ASC
+                                                LIMIT ${parsedLimit} OFFSET ${parsedOffset};`);
         return result;
     } catch (error) {
         throw new Error(error.message);

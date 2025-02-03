@@ -11,7 +11,7 @@ import {
 const router = express.Router();
 
 router.get('/invoice', getAllInvoices );
-router.get('/paginatedInvoice/:limit/:offset', getPaginatedSortedInvoices);
+router.get('/paginatedInvoices/:limit/:offset', getPaginatedSortedInvoices);
 router.get('/invoice/:id', getOneInvoice);
 router.put('/invoice/:id', updateOneInvoice );
 router.post('/invoice', createOneInvoice );
