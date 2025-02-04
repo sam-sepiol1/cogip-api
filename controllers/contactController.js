@@ -3,9 +3,11 @@ import {
     createContact,
     editContact,
     deleteContact,
-    getPaginatedContacts, getContactByName, sortAscContacts, sortDescContacts, countAllContacts
+    getContactByName,
+    sortAscContacts,
+    sortDescContacts,
+    countAllContacts
 } from "../models/contactModel.js";
-import {getCompanyByName, getPaginatedCompanies} from "../models/companyModel.js";
 
 export const fetchContacts = async (req, res) => {
     try {
