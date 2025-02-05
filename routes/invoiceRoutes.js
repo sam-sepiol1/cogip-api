@@ -5,14 +5,13 @@ import {
     getAllInvoices,
     updateOneInvoice,
     getOneInvoice,
-    getPaginatedSortedInvoices, sortAscDueDateInvoices, sortDescDueDateInvoices
+    getPaginatedSortedInvoices, sortAscDueDateInvoices, sortDescDueDateInvoices, countInvoices
 } from "../controllers/invoiceController.js";
-import {countAllInvoices} from "../models/invoiceModel.js";
 
 const router = express.Router();
 
 router.get('/invoice', getAllInvoices );
-router.get('/countInvoices', countAllInvoices);
+router.get('/countInvoices', countInvoices);
 router.get('/paginatedInvoices/:limit/:offset', getPaginatedSortedInvoices);
 router.get('/sortAscDueDate/:limit/:offset', sortAscDueDateInvoices)
 router.get('/sortDescDueDate/:limit/:offset', sortDescDueDateInvoices)
