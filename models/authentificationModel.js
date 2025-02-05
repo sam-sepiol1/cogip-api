@@ -10,12 +10,15 @@ export const register = async (first_name, last_name, role_id, email, password) 
         }
 
         const hashedPassword = await Bcrypt.hash(password, 8);
+
         const [createdUser] = await connexion.query('INSERT INTO users (first_name, last_name, role_id, email, password) VALUES (?, ?, ?, ?, ?)', [first_name, last_name, role_id, email, hashedPassword]);
+
         return createdUser;
     } catch (error) {
+        console.error("Erreur:", error.message);
         throw new Error(error.message);
     }
-}
+};
 
 export const login = async (email, password) => {
     try {

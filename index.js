@@ -11,7 +11,10 @@ import permissionsRoutes from "./routes/permissionsRoutes.js";
 import { authenticate } from "./controllers/authentificationController.js";
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3001',
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS']
+}));
 
 dotenv.config();
 app.use(express.json());
