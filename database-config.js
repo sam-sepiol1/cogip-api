@@ -193,32 +193,17 @@ async function createTables(connexion) {
                 );`);
 
         await connexion.query(`
-                CREATE TABLE IF NOT EXISTS invoices
-                (
-                    id
-                    INT
-                    AUTO_INCREMENT
-                    PRIMARY
-                    KEY,
-                    ref
-                    VARCHAR
-                (
-                    255
-                ) NOT NULL,
-                    id_company INT NOT NULL,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    due_date DATETIME NOT NULL,
-                    FOREIGN KEY
-                (
-                    id_company
-                ) REFERENCES companies
-                (
-                    id
+            CREATE TABLE IF NOT EXISTS invoices (
+                                                    id INT AUTO_INCREMENT PRIMARY KEY,
+                                                    ref VARCHAR(255) NOT NULL,
+                price DECIMAL(10,2) NOT NULL,
+                id_company INT NOT NULL,
+                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                due_date DATETIME NOT NULL,
+                FOREIGN KEY (id_company) REFERENCES companies(id) ON DELETE CASCADE
                 )
-                                                                  ON DELETE CASCADE
-                    )
-            `);
+        `);
 
         await connexion.query(`CREATE TABLE IF NOT EXISTS contacts
             (
@@ -316,13 +301,13 @@ async function populateDatabase(connexion) {
             `);
 
             await connexion.query(`
-                INSERT INTO invoices (ref, id_company, due_date)
-                VALUES ('INV-1001', 1, DATE_ADD(NOW(), INTERVAL 2 YEAR)),
-                       ('INV-1002', 2, DATE_ADD(NOW(), INTERVAL 2 YEAR)),
-                       ('INV-1003', 3, DATE_ADD(NOW(), INTERVAL 2 YEAR)),
-                       ('INV-1004', 4, DATE_ADD(NOW(), INTERVAL 2 YEAR)),
-                       ('INV-1005', 5, DATE_ADD(NOW(), INTERVAL 2 YEAR))
-            `);
+                INSERT INTO invoices (ref, price, id_company, due_date)
+                VALUES
+                    ('INV-1001', 199.99, 1, DATE_ADD(NOW(), INTERVAL 2 YEAR)),
+                    ('INV-1002', 349.50, 2, DATE_ADD(NOW(), INTERVAL 2 YEAR)),
+                    ('INV-1003', 125.75, 3, DATE_ADD(NOW(), INTERVAL 2 YEAR)),
+                    ('INV-1004', 210.00, 4, DATE_ADD(NOW(), INTERVAL 2 YEAR)),
+                    ('INV-1005', 99.99, 5, DATE_ADD(NOW(), INTERVAL 2 YEAR));`);
 
             console.log(`Base de données remplie avec succès !`);
 
