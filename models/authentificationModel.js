@@ -1,9 +1,10 @@
-import connexion from "../database-config.js";
 import Bcrypt from "bcrypt";
+import connexion from "../database-config.js";
 
 export const register = async (first_name, last_name, role_id, email, password) => {
     try {
         const userExists = await checkIfUserAlreadyExists(email);
+
         if (userExists) {
             throw new Error('User already exists');
         }
@@ -38,9 +39,5 @@ export const login = async (email, password) => {
 const checkIfUserAlreadyExists = async (email) => {
     const [result] = await connexion.query('SELECT * FROM users WHERE email = ?', [email]);
 
-    if (result.length === 0) {
-        return null;
-    } else {
-        return result[0];
-    }
+    if (result.length > 0) return result[0];
 }
