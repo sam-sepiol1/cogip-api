@@ -1,5 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import cors from 'cors';
 import userRoutes from './routes/userRoutes.js';
 import authentificationRoutes from './routes/authentificationRoutes.js';
 import companyRoutes from './routes/companyRoutes.js';
@@ -10,6 +11,7 @@ import permissionsRoutes from "./routes/permissionsRoutes.js";
 import { authenticate } from "./controllers/authentificationController.js";
 
 const app = express();
+app.use(cors());
 
 dotenv.config();
 app.use(express.json());
