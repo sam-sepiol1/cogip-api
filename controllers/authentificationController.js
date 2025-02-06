@@ -20,20 +20,22 @@ export const logUser = async (req, res) => {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            res.status(500).send('Missing mandatory fields !');
+            return res.status(400).json({ message: 'Missing mandatory fields!' });
         }
 
         const user = await login(email, password);
 
         if (!user) {
-            res.status(500).send('Invalid credentials');
+            return res.status(401).json({ message: 'Incorrect email or password' });
         }
 
-        const token = jwt.sign( { user: user }, process.env.SECRET_KEY, { expiresIn: '7h' });
-        return res.status(200).json({ message: token });
+        const token = jwt.sign({ user }, process.env.SECRET_KEY, { expiresIn: '7h' });
+
+        return res.status(200).json({ token });
 
     } catch (error) {
-        res.status(500).send(error.message);
+        console.error("Login error:", error);
+        return res.status(500).json({ message: "Internal server error" });
     }
 };
 

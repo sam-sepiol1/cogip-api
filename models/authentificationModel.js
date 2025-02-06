@@ -23,20 +23,22 @@ export const register = async (first_name, last_name, role_id, email, password) 
 
 export const login = async (email, password) => {
     try {
-        const userExists = await checkIfUserAlreadyExists(email);
-        if (!userExists) {
+        const user = await checkIfUserAlreadyExists(email);
+
+        if (!user) {
             throw new Error('Invalid email or password');
         }
 
-        const isMatch = await Bcrypt.compare(password, userExists.password);
+        const isMatch = await Bcrypt.compare(password, user.password);
 
-        if (isMatch) {
-            return userExists;
-        } else {
-            throw new Error('Invalid credentials');
+        if (!isMatch) {
+            throw new Error('Invalid email or password');
         }
+
+        return user;
     } catch (error) {
-        throw new Error(error);
+        console.error("Login error:", error.message);
+        return null;
     }
 };
 
@@ -45,7 +47,7 @@ const checkIfUserAlreadyExists = async (email) => {
     const [result] = await connexion.query('SELECT * FROM users WHERE email = ?', [email]);
 
     return result.length > 0 ? result[0] : null;
-}
+};
 
 // TODO avec un vrai pc et une putin de co stable !
 // export const checkMailValidity = async (email) => {
