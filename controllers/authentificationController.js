@@ -4,11 +4,12 @@ import { login, register } from "../models/authentificationModel.js";
 export const createUser = async (req, res) => {
     try {
         const { first_name, last_name, role_id, email, password } = req.body;
-        await register(first_name, last_name, role_id, email, password);
-
-        res.status(200).json("Utilisateur crée avec succès !");
+        const user = await register(first_name, last_name, role_id, email, password);
+        console.log(user)
+        res.status(200).json("Utilisateur crée avec succès !", user);
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.log("Erreur Co")
+        res.status(409).json({ message: error.message });
     }
 };
 
