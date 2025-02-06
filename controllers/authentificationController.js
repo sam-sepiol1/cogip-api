@@ -4,11 +4,14 @@ import { login, register } from "../models/authentificationModel.js";
 export const createUser = async (req, res) => {
     try {
         const { first_name, last_name, role_id, email, password } = req.body;
-        await register(first_name, last_name, role_id, email, password);
 
-        res.status(200).json("Utilisateur crée avec succès !");
+       // TODO avec un vrai pc et une putin de co stable ! await checkMailValidity(email);
+
+        const user = await register(first_name, last_name, role_id, email, password);
+
+        return res.status(200).json({ message: "User successfully created.", data: user });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(409).json(error.response.data);
     }
 };
 
@@ -39,13 +42,13 @@ export const authenticate = (req, res, next) => {
     const token = authHeader && authHeader.split(' ')[1];
 
     if (!token) {
-        res.status(500).send('Not authorized');
+        res.status(403).send('Not authorized');
     }
 
     try {
         req.user = jwt.verify(token, process.env.SECRET_KEY);
         next();
     } catch (error) {
-        res.status(500).send(error.message);
+        return res.status(403).send({ message: 'Invalid token' });
     }
 }

@@ -4,7 +4,6 @@ import connexion from "../database-config.js";
 export const register = async (first_name, last_name, role_id, email, password) => {
     try {
         const userExists = await checkIfUserAlreadyExists(email);
-
         if (userExists) {
             throw new Error('User already exists');
         }
@@ -13,9 +12,11 @@ export const register = async (first_name, last_name, role_id, email, password) 
 
         const [createdUser] = await connexion.query('INSERT INTO users (first_name, last_name, role_id, email, password) VALUES (?, ?, ?, ?, ?)', [first_name, last_name, role_id, email, hashedPassword]);
 
-        return createdUser;
+        const [user] = await connexion.query('SELECT * FROM users WHERE id=?', [createdUser.insertId]);
+
+        return user[0];
     } catch (error) {
-        console.error("Erreur:", error.message);
+        console.error("Erreur lors de la création de l'utilisateur :", error.message);
         throw new Error(error.message);
     }
 };
@@ -40,7 +41,19 @@ export const login = async (email, password) => {
 };
 
 const checkIfUserAlreadyExists = async (email) => {
+    console.log('check if user exists')
     const [result] = await connexion.query('SELECT * FROM users WHERE email = ?', [email]);
 
-    if (result.length > 0) return result[0];
+    return result.length > 0 ? result[0] : null;
 }
+
+// TODO avec un vrai pc et une putin de co stable !
+// export const checkMailValidity = async (email) => {
+   // const validMail = '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/';
+
+   // if(!validMail.match(email)) {
+     //   throw new Error('Invalid email format.');
+   // } else {
+     //   return true;
+   // }
+// }
