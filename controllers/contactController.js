@@ -8,31 +8,40 @@ import {
     sortDescContacts,
     countAllContacts
 } from "../models/contactModel.js";
+import { NotFoundError, BadRequestError, DatabaseError } from '../errors/customErrors.js';
 
 export const fetchContacts = async (req, res) => {
     try {
         const contacts = await getAllContacts();
 
-        if (!contacts) {
-            return res.status(500).json({ message: "No contacts found." });
+        if (!contacts || contacts.length === 0) {
+            throw new NotFoundError('No contacts found');
         }
-        res.status(200).json(contacts);
+
+        res.status(200).json({
+            success: true,
+            data: contacts
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (error.name === 'NotFoundError') throw error;
+        throw new DatabaseError('Error while fetching contacts');
     }
 };
 
-export const countContacts = async (req, res) => {
+export const countContacts = async (req, res, next) => {
     try {
-        const count= await countAllContacts();
+        const count = await countAllContacts();
 
         if (count === null) {
-            return res.status(500).json({ message: "Failed to count contacts." });
+            throw new DatabaseError('Failed to count contacts');
         }
 
-        res.status(200).json({ totalContacts: count });
+        res.status(200).json({
+            success: true,
+            total: count
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        next(error);
     }
 };
 
@@ -54,46 +63,71 @@ export const getSortedContactsByNameASC = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
-        const datas = await sortAscContacts(limit, offset);
-
-        if (!datas.length) {
-            return res.status(500).json({message:"No contacts found"});
+        if (!limit || !offset) {
+            throw new BadRequestError('Limit and offset are required');
         }
 
-        res.status(200).json(datas);
+        const contacts = await sortAscContacts(limit, offset);
+
+        if (!contacts || contacts.length === 0) {
+            throw new NotFoundError('No contacts found');
+        }
+
+        res.status(200).json({
+            success: true,
+            data: contacts
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while fetching sorted contacts');
     }
-}
+};
 
 export const getSortedContactsByNameDESC = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
-        const datas = await sortDescContacts(limit, offset);
-
-        if (!datas.length) {
-            return res.status(500).json({message:"No contacts found"});
+        if (!limit || !offset) {
+            throw new BadRequestError('Limit and offset are required');
         }
 
-        res.status(200).json(datas);
+        const contacts = await sortDescContacts(limit, offset);
+
+        if (!contacts || contacts.length === 0) {
+            throw new NotFoundError('No contacts found');
+        }
+
+        res.status(200).json({
+            success: true,
+            data: contacts
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while fetching sorted contacts');
     }
-}
+};
 
 export const removeContact = async (req, res) => {
     try {
         const { id } = req.params;
 
+        if (!id) {
+            throw new BadRequestError('Contact ID is required');
+        }
+
         const deleted = await deleteContact(id);
 
         if (!deleted) {
-            return res.status(500).json({ message: "Contact not found." });
+            throw new NotFoundError('Contact not found');
         }
-        res.status(200).json({ message: "Contact deleted successfully" });
+
+        res.status(200).json({
+            success: true,
+            message: 'Contact deleted successfully'
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while deleting contact');
     }
 };
 
@@ -102,15 +136,27 @@ export const updateContact = async (req, res) => {
         const { id } = req.params;
         const { name, company_id, email, phone } = req.body;
 
+        if (!id) {
+            throw new BadRequestError('Contact ID is required');
+        }
+
+        if (!name && !company_id && !email && !phone) {
+            throw new BadRequestError('At least one field to update is required');
+        }
+
         const updated = await editContact(id, { name, company_id, email, phone });
 
         if (!updated) {
-            return res.status(404).json({ message: "Contact not found" });
+            throw new NotFoundError('Contact not found');
         }
 
-        res.status(200).json({ message: "Contact updated successfully" });
+        res.status(200).json({
+            success: true,
+            message: 'Contact updated successfully'
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while updating contact');
     }
 };
 
@@ -118,14 +164,20 @@ export const saveContact = async (req, res) => {
     try {
         const { name, company_id, email, phone } = req.body;
 
+        if (!name || !company_id || !email || !phone) {
+            throw new BadRequestError('All fields are required');
+        }
+
         const contactId = await createContact({ name, company_id, email, phone });
 
         res.status(201).json({
-            message: "Contact created successfully",
-            contactId: contactId
+            success: true,
+            message: 'Contact created successfully',
+            data: { contactId }
         });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while creating contact');
     }
 };
 
