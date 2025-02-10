@@ -197,13 +197,13 @@ export const updateOneInvoice = async (req, res) => {
 
 export const createOneInvoice = async (req, res) => {
     try {
-        const { ref, id_company } = req.body;
+        const { ref, price, id_company } = req.body;
 
-        if (!ref || !id_company) {
+        if (!ref || !id_company || !price ) {
             throw new BadRequestError('All fields are required');
         }
 
-        const invoiceId = await createInvoice({ ref, id_company });
+        const invoiceId = await createInvoice({ ref, price, id_company });
 
         res.status(201).json({
             success: true,
