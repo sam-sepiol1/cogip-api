@@ -1,7 +1,8 @@
-export const errorHandler = (err, req, res, next) => {
-    console.error(err); // Log error for debugging
+import { DatabaseError, ValidationError } from "../errors/customErrors.js";
 
-    // Handle specific error types
+export const errorHandler = (err, req, res) => {
+    console.error(err);
+
     if (err instanceof ValidationError) {
         return res.status(422).json({
             success: false,
@@ -22,7 +23,6 @@ export const errorHandler = (err, req, res, next) => {
         });
     }
 
-    // Default error response
     res.status(err.statusCode || 500).json({
         success: false,
         error: {
@@ -32,4 +32,4 @@ export const errorHandler = (err, req, res, next) => {
                 : err.message
         }
     });
-}; 
+};
