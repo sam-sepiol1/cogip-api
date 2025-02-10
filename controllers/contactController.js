@@ -9,6 +9,7 @@ import {
     countAllContacts
 } from "../models/contactModel.js";
 import { NotFoundError, BadRequestError, DatabaseError } from '../errors/customErrors.js';
+import {getCompanyByName} from "../models/companyModel.js";
 
 export const fetchContacts = async (req, res) => {
     try {
@@ -162,13 +163,16 @@ export const updateContact = async (req, res) => {
 
 export const saveContact = async (req, res) => {
     try {
-        const { name, company_id, email, phone } = req.body;
+        const { name, company_name, email, phone } = req.body;
 
-        if (!name || !company_id || !email || !phone) {
+        if (!name || !company_name || !email || !phone) {
             throw new BadRequestError('All fields are required');
         }
 
-        const contactId = await createContact({ name, company_id, email, phone });
+        const company = await getCompanyByName(company_name);
+        const companyId = company.id;
+
+        const contactId = await createContact({ name, companyId, email, phone });
 
         res.status(201).json({
             success: true,

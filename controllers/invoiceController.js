@@ -10,6 +10,7 @@ import {
     countAllInvoices
 } from '../models/invoiceModel.js';
 import { NotFoundError, BadRequestError, DatabaseError } from '../errors/customErrors.js';
+import {getCompanyByName} from "../models/companyModel.js";
 
 export const getAllInvoices = async (req, res) => {
     try {
@@ -197,13 +198,16 @@ export const updateOneInvoice = async (req, res) => {
 
 export const createOneInvoice = async (req, res) => {
     try {
-        const { ref, price, id_company } = req.body;
+        const { ref, price, company_name } = req.body;
 
-        if (!ref || !id_company || !price ) {
+        if (!ref || !company_name || !price ) {
             throw new BadRequestError('All fields are required');
         }
 
-        const invoiceId = await createInvoice({ ref, price, id_company });
+        const company = await getCompanyByName(company_name);
+        const companyId = company.id;
+
+        const invoiceId = await createInvoice({ ref, price, companyId });
 
         res.status(201).json({
             success: true,
