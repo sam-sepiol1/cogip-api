@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { login, register } from "../models/authentificationModel.js";
-import { AuthenticationError, BadRequestError, ConflictError, ValidationError } from '../errors/customErrors.js';
+import { AuthenticationError, ConflictError, ValidationError } from '../errors/customErrors.js';
 
 export const createUser = async (req, res, next) => {
     try {
