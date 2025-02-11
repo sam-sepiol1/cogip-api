@@ -205,9 +205,9 @@ export const createOneInvoice = async (req, res) => {
         }
 
         const company = await getCompanyByName(company_name);
-        const companyId = company.id;
+        const id_company = company[0].id;
 
-        const invoiceId = await createInvoice({ ref, price, companyId });
+        const invoiceId = await createInvoice({ ref, price, id_company });
 
         res.status(201).json({
             success: true,
