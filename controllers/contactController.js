@@ -170,10 +170,9 @@ export const saveContact = async (req, res) => {
         }
 
         const company = await getCompanyByName(company_name);
-        const companyId = company.id;
+        const company_id = company[0].id;
 
-        const contactId = await createContact({ name, companyId, email, phone });
-
+        const contactId = await createContact({ name, company_id, email, phone });
         res.status(201).json({
             success: true,
             message: 'Contact created successfully',
