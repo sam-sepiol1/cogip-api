@@ -1,6 +1,6 @@
 import { DatabaseError, ValidationError } from "../errors/customErrors.js";
 
-export const errorHandler = (err, req, res) => {
+export const errorHandler = (err, req, res, next) => {
     console.error(err);
 
     if (err instanceof ValidationError) {
@@ -23,7 +23,7 @@ export const errorHandler = (err, req, res) => {
         });
     }
 
-    res.status(err.statusCode || 500).json({
+    return res.status(err.statusCode || 500).json({
         success: false,
         error: {
             code: err.code || 'INTERNAL_SERVER_ERROR',
