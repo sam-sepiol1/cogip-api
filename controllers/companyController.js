@@ -201,24 +201,34 @@ export const updateOneCompany = async (req, res) => {
     }
 };
 
-export const createOneCompany = async (req, res) => {
+export const createOneCompany = async (req, res, next) => {
     try {
         const { name, type_id, country, tva } = req.body;
-
         if (!name || !type_id || !country || !tva) {
             throw new BadRequestError('All fields are required');
         }
 
-        const companyId = await createCompany({ name, type_id, country, tva });
+        try {
+            const companyId = await createCompany({ name, type_id, country, tva });
 
-        res.status(201).json({
-            success: true,
-            message: 'Company created successfully',
-            data: { companyId }
-        });
+            if (!companyId) {
+                throw new DatabaseError('Failed to create company');
+            }
+
+            res.status(201).json({
+                success: true,
+                message: 'Company created successfully',
+                data: { companyId }
+            });
+        } catch (dbError) {
+            if (dbError.message.includes('Duplicate entry') && dbError.message.includes('tva')) {
+                throw new BadRequestError(`This TVA number already exists`);
+            }
+            console.error('Error while creating company :', dbError);
+            throw new DatabaseError('Error while creating company');
+        }
     } catch (error) {
-        if (error.name === 'BadRequestError') throw error;
-        throw new DatabaseError('Error while creating company');
+        next(error);
     }
 };
 
