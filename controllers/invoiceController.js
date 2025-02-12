@@ -4,19 +4,29 @@ import {
     updateInvoice,
     createInvoice,
     getInvoiceById,
-    getPaginatedInvoices, sortedAscByDueDateInvoices, sortedDescByDueDateInvoices, countAllInvoices
-} from '../models/invoiceModel.js'
+    getPaginatedInvoices,
+    sortedAscByDueDateInvoices,
+    sortedDescByDueDateInvoices,
+    countAllInvoices
+} from '../models/invoiceModel.js';
+import { NotFoundError, BadRequestError, DatabaseError } from '../errors/customErrors.js';
+import {getCompanyByName} from "../models/companyModel.js";
 
 export const getAllInvoices = async (req, res) => {
     try {
         const invoices = await getInvoices();
 
-        if (!invoices) {
-            return res.status(500).json({message:"No invoices found"});
+        if (!invoices || invoices.length === 0) {
+            throw new NotFoundError('No invoices found');
         }
-        res.status(200).json(invoices);
+
+        res.status(200).json({
+            success: true,
+            data: invoices
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'NotFoundError') throw error;
+        throw new DatabaseError('Error while fetching invoices');
     }
 };
 
@@ -25,12 +35,15 @@ export const countInvoices = async (req, res) => {
         const count = await countAllInvoices();
 
         if (count === null) {
-            return res.status(500).json({ message: "Failed to count invoices." });
+            throw new DatabaseError('Failed to count invoices');
         }
 
-        res.status(200).json({ totalInvoices: count });
+        res.status(200).json({
+            success: true,
+            total: count
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        throw new DatabaseError('Error while counting invoices');
     }
 };
 
@@ -38,14 +51,23 @@ export const getOneInvoice = async (req, res) => {
     try {
         const { id } = req.params;
 
+        if (!id) {
+            throw new BadRequestError('Invoice ID is required');
+        }
+
         const invoice = await getInvoiceById(id);
 
         if (!invoice) {
-            return res.status(500).json({message:"No invoice found"});
+            throw new NotFoundError('Invoice not found');
         }
-        res.status(200).json(invoice);
+
+        res.status(200).json({
+            success: true,
+            data: invoice
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while fetching invoice');
     }
 };
 
@@ -53,15 +75,23 @@ export const getPaginatedSortedInvoices = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
-        const datas = await getPaginatedInvoices(limit, offset);
-
-        if (!datas.length) {
-            return res.status(500).json({message:"No invoices found"});
+        if (!limit || !offset) {
+            throw new BadRequestError('Limit and offset are required');
         }
 
-        res.status(200).json(datas);
+        const invoices = await getPaginatedInvoices(limit, offset);
+
+        if (!invoices || invoices.length === 0) {
+            throw new NotFoundError('No invoices found');
+        }
+
+        res.status(200).json({
+            success: true,
+            data: invoices
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while fetching paginated invoices');
     }
 };
 
@@ -69,15 +99,23 @@ export const sortAscDueDateInvoices = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
-        const datas = await sortedAscByDueDateInvoices(limit, offset);
-
-        if (!datas.length) {
-            return res.status(500).json({message:"No invoices found"});
+        if (!limit || !offset) {
+            throw new BadRequestError('Limit and offset are required');
         }
 
-        res.status(200).json(datas);
+        const invoices = await sortedAscByDueDateInvoices(limit, offset);
+
+        if (!invoices || invoices.length === 0) {
+            throw new NotFoundError('No invoices found');
+        }
+
+        res.status(200).json({
+            success: true,
+            data: invoices
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while fetching sorted invoices');
     }
 };
 
@@ -85,15 +123,23 @@ export const sortDescDueDateInvoices = async (req, res) => {
     try {
         const { limit, offset } = req.params;
 
-        const datas = await sortedDescByDueDateInvoices(limit, offset);
-
-        if (!datas.length) {
-            return res.status(500).json({message:"No invoices found"});
+        if (!limit || !offset) {
+            throw new BadRequestError('Limit and offset are required');
         }
 
-        res.status(200).json(datas);
+        const invoices = await sortedDescByDueDateInvoices(limit, offset);
+
+        if (!invoices || invoices.length === 0) {
+            throw new NotFoundError('No invoices found');
+        }
+
+        res.status(200).json({
+            success: true,
+            data: invoices
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while fetching sorted invoices');
     }
 };
 
@@ -101,14 +147,23 @@ export const deleteInvoice = async (req, res) => {
     try {
         const { id } = req.params;
 
+        if (!id) {
+            throw new BadRequestError('Invoice ID is required');
+        }
+
         const deleted = await removeInvoice(id);
 
         if (!deleted) {
-            return res.status(500).json({message:"No invoice found"});
+            throw new NotFoundError('Invoice not found');
         }
-        res.status(200).json({message:"Successfully deleted invoice"});
+
+        res.status(200).json({
+            success: true,
+            message: 'Invoice deleted successfully'
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while deleting invoice');
     }
 };
 
@@ -117,25 +172,50 @@ export const updateOneInvoice = async (req, res) => {
         const { id } = req.params;
         const { ref, id_company } = req.body;
 
-        const updated = await updateInvoice(id, {ref, id_company});
+        if (!id) {
+            throw new BadRequestError('Invoice ID is required');
+        }
+
+        if (!ref && !id_company) {
+            throw new BadRequestError('At least one field to update is required');
+        }
+
+        const updated = await updateInvoice(id, { ref, id_company });
 
         if (!updated) {
-            return res.status(500).json({message:"No invoice found"});
+            throw new NotFoundError('Invoice not found');
         }
-        res.status(200).json({message:"Successfully updated invoice"});
+
+        res.status(200).json({
+            success: true,
+            message: 'Invoice updated successfully'
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while updating invoice');
     }
 };
 
 export const createOneInvoice = async (req, res) => {
     try {
-        const { ref, id_company } = req.body;
+        const { ref, price, company_name } = req.body;
 
-        const invoice = await createInvoice({ ref, id_company });
+        if (!ref || !company_name || !price ) {
+            throw new BadRequestError('All fields are required');
+        }
 
-        res.status(201).json({message:"Successfully created invoice"});
+        const company = await getCompanyByName(company_name);
+        const id_company = company[0].id;
+
+        const invoiceId = await createInvoice({ ref, price, id_company });
+
+        res.status(201).json({
+            success: true,
+            message: 'Invoice created successfully',
+            data: { invoiceId }
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while creating invoice');
     }
 };

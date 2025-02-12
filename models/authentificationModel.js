@@ -48,14 +48,3 @@ const checkIfUserAlreadyExists = async (email) => {
 
     return result.length > 0 ? result[0] : null;
 };
-
-// TODO avec un vrai pc et une putin de co stable !
-// export const checkMailValidity = async (email) => {
-   // const validMail = '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/';
-
-   // if(!validMail.match(email)) {
-     //   throw new Error('Invalid email format.');
-   // } else {
-     //   return true;
-   // }
-// }

@@ -96,12 +96,12 @@ export const updateInvoice = async (id, { ref, id_company }) => {
     }
 };
 
-export const createInvoice = async ({ ref, id_company }) => {
+export const createInvoice = async ({ ref, price, id_company }) => {
     try {
         const [result] = await connexion.query(
-            `INSERT INTO invoices (ref, id_company, due_date)
-             VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 2 YEAR))`,
-            [ref, id_company]
+            `INSERT INTO invoices (ref, price,  id_company, due_date)
+             VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL 2 YEAR))`,
+            [ref, price, id_company]
         );
         return result.insertId;
     } catch (error) {

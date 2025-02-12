@@ -1,20 +1,21 @@
 import connexion from "../database-config.js";
+import { DatabaseError } from '../errors/customErrors.js';
 
 export const getAllContacts = async () => {
     try {
         const [contact] = await connexion.query('SELECT * FROM contacts');
         return contact;
     } catch (error) {
-        throw new Error(error.message);
+        throw new DatabaseError(error.message);
     }
 };
 
 export const countAllContacts = async () => {
     try {
-        const [result] = await connexion.query('SELECT COUNT (*) AS total FROM contacts');
+        const [result] = await connexion.query('SELECT COUNT(*) AS total FROM contacts');
         return result[0].total;
     } catch (error) {
-        throw new Error(error.message);
+        throw new DatabaseError(error.message);
     }
 };
 
@@ -23,7 +24,7 @@ export const getContactByName = async (name) => {
         const [result] = await connexion.query('SELECT * FROM contacts WHERE name = ?', [name]);
         return result;
     } catch (error) {
-        throw new Error(error.message);
+        throw new DatabaseError(error.message);
     }
 };
 
@@ -39,9 +40,9 @@ export const sortAscContacts = async (limit, offset) => {
                                                 LIMIT ${parsedLimit} OFFSET ${parsedOffset};`);
         return result;
     } catch (error) {
-        throw new Error(error.message);
+        throw new DatabaseError(error.message);
     }
-}
+};
 
 export const sortDescContacts = async (limit, offset) => {
     try {
@@ -55,16 +56,16 @@ export const sortDescContacts = async (limit, offset) => {
                                                 LIMIT ${parsedLimit} OFFSET ${parsedOffset};`);
         return result;
     } catch (error) {
-        throw new Error(error.message);
+        throw new DatabaseError(error.message);
     }
-}
+};
 
 export const deleteContact = async (id) => {
     try {
         const [result] = await connexion.query('DELETE FROM contacts WHERE id = ?', [id]);
         return result.affectedRows > 0;
     } catch (error) {
-        throw new Error(error.message);
+        throw new DatabaseError(error.message);
     }
 };
 
@@ -72,14 +73,16 @@ export const editContact = async (id, { name, company_id, email, phone }) => {
     try {
         const [result] = await connexion.query(
             `UPDATE contacts 
-             SET  name = ?, company_id = ?, email = ?, phone = ?
+             SET name = COALESCE(?, name),
+                 company_id = COALESCE(?, company_id),
+                 email = COALESCE(?, email),
+                 phone = COALESCE(?, phone)
              WHERE id = ?`,
-            [name, company_id, email, phone]
+            [name, company_id, email, phone, id]
         );
-
         return result.affectedRows > 0;
     } catch (error) {
-        throw new Error(error.message);
+        throw new DatabaseError(error.message);
     }
 };
 
@@ -93,6 +96,6 @@ export const createContact = async ({ name, company_id, email, phone }) => {
 
         return result.insertId;
     } catch (error) {
-        throw new Error(error.message);
+        throw new DatabaseError(error.message);
     }
 };

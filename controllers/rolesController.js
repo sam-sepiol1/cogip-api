@@ -1,18 +1,27 @@
 import { createRoles, getRolesByUserId, removeRole, updateRoles } from '../models/rolesModel.js'
+import { NotFoundError, BadRequestError, DatabaseError } from '../errors/customErrors.js'
 
 export const getRolesForUser = async (req, res) => {
     try {
         const { userId } = req.params;
 
         if (!userId) {
-            return res.status(400).json({ message: "User ID is required" });
+            throw new BadRequestError('User ID is required');
         }
 
         const roles = await getRolesByUserId(userId);
 
-        res.status(200).json(roles);
+        if (!roles || roles.length === 0) {
+            throw new NotFoundError('No roles found for this user');
+        }
+
+        res.status(200).json({
+            success: true,
+            data: roles
+        });
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while fetching user roles');
     }
 };
 
@@ -20,11 +29,20 @@ export const createRole = async (req, res) => {
     try {
         const { name } = req.body;
 
-        const role = await createRoles({ name });
+        if (!name) {
+            throw new BadRequestError('Role name is required');
+        }
 
-        res.status(200).json(role);
+        const roleId = await createRoles({ name });
+
+        res.status(201).json({
+            success: true,
+            message: 'Role created successfully',
+            data: { roleId }
+        });
     } catch (error) {
-        res.status(500).json({message: error.message});
+        if (error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while creating role');
     }
 };
 
@@ -33,10 +51,27 @@ export const updateRole = async (req, res) => {
         const { name } = req.body;
         const { id } = req.params;
 
+        if (!id) {
+            throw new BadRequestError('Role ID is required');
+        }
+
+        if (!name) {
+            throw new BadRequestError('Role name is required');
+        }
+
         const updated = await updateRoles(id, { name });
-        res.status(200).json(updated);
+
+        if (!updated) {
+            throw new NotFoundError('Role not found');
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Role updated successfully'
+        });
     } catch (error) {
-        res.status(500).json(error);
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while updating role');
     }
 };
 
@@ -44,13 +79,22 @@ export const deleteRole = async (req, res) => {
     try {
         const { id } = req.params;
 
+        if (!id) {
+            throw new BadRequestError('Role ID is required');
+        }
+
         const deleted = await removeRole(id);
 
         if (!deleted) {
-            return res.status(500).json({message: 'No roles found'});
+            throw new NotFoundError('Role not found');
         }
-        res.status(200).json(deleted);
+
+        res.status(200).json({
+            success: true,
+            message: 'Role deleted successfully'
+        });
     } catch (error) {
-        res.status(500).json(error);
+        if (error.name === 'NotFoundError' || error.name === 'BadRequestError') throw error;
+        throw new DatabaseError('Error while deleting role');
     }
 };

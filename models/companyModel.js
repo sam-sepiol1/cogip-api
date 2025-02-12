@@ -11,10 +11,10 @@ import connexion from "../database-config.js";
 
 export const countAllCompanies = async () => {
     try {
-        const [result] = await connexion.query("SELECT COUNT(*) AS total FROM companies");
+        const [result] = await connexion.query('SELECT COUNT(*) as total FROM companies');
         return result[0].total;
     } catch (error) {
-        throw new Error(error.message);
+        throw new Error(`Database error: ${error.message}`);
     }
 };
 

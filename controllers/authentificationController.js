@@ -1,56 +1,102 @@
 import jwt from 'jsonwebtoken';
 import { login, register } from "../models/authentificationModel.js";
+import { AuthenticationError, ConflictError, ValidationError } from '../errors/customErrors.js';
 
-export const createUser = async (req, res) => {
+export const createUser = async (req, res, next) => {
     try {
         const { first_name, last_name, role_id, email, password } = req.body;
 
-       // TODO avec un vrai pc et une putin de co stable ! await checkMailValidity(email);
+        if (!first_name || !last_name || !email || !password) {
+            throw new ValidationError('Missing required fields');
+        }
+
+        if (password.length < 6) {
+            throw new ValidationError('Password must be at least 6 characters long');
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            throw new ValidationError('Invalid email format');
+        }
 
         const user = await register(first_name, last_name, role_id, email, password);
 
-        return res.status(200).json({ message: "User successfully created.", data: user });
+        const token = jwt.sign({ user }, process.env.SECRET_KEY, { expiresIn: '7h' });
+
+        return res.status(200).json({
+            success: true,
+            message: "User successfully created.",
+            data: {
+                user,
+                token
+            }
+        });
     } catch (error) {
-        res.status(409).json(error.response.data);
+        if (error.name === 'ValidationError' || error.name === 'ConflictError') {
+            next(error);
+            return;
+        }
+
+        if (error.message === 'User already exists') {
+            next(new ConflictError('User with this email already exists'));
+            return;
+        }
+
+        next(error);
     }
 };
 
-export const logUser = async (req, res) => {
+export const logUser = async (req, res, next) => {
     try {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ message: 'Missing mandatory fields!' });
+            throw new ValidationError('Email and password are required');
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            throw new ValidationError('Invalid email format');
         }
 
         const user = await login(email, password);
 
         if (!user) {
-            return res.status(401).json({ message: 'Incorrect email or password' });
+            throw new AuthenticationError('Invalid email or password');
         }
 
         const token = jwt.sign({ user }, process.env.SECRET_KEY, { expiresIn: '7h' });
 
-        return res.status(200).json({ token });
-
+        return res.status(200).json({
+            success: true,
+            data: { token }
+        });
     } catch (error) {
-        console.error("Login error:", error);
-        return res.status(500).json({ message: "Internal server error" });
+        if (error.name === 'ValidationError' || error.name === 'AuthenticationError') {
+            next(error);
+            return;
+        }
+
+        next(new AuthenticationError('Authentication failed'));
     }
 };
 
 export const authenticate = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-
-    if (!token) {
-        res.status(403).send('Not authorized');
-    }
-
     try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+
+        if (!token) {
+            throw new AuthenticationError('No token provided');
+        }
+
         req.user = jwt.verify(token, process.env.SECRET_KEY);
         next();
     } catch (error) {
-        return res.status(403).send({ message: 'Invalid token' });
+        if (error.name === 'JsonWebTokenError') {
+            next(new AuthenticationError('Invalid token'));
+            return;
+        }
+        next(new AuthenticationError('Authentication failed'));
     }
-}
+};
