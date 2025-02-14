@@ -8,7 +8,6 @@ import invoiceRoutes from './routes/invoiceRoutes.js';
 import contactRoutes from "./routes/contactRoutes.js";
 import rolesRoutes from "./routes/rolesRoutes.js";
 import permissionsRoutes from "./routes/permissionsRoutes.js";
-import { authenticate } from "./controllers/authentificationController.js";
 import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
@@ -31,8 +30,8 @@ app.use('/api', userRoutes);
 app.use('/api', permissionsRoutes);
 app.use('/api', invoiceRoutes);
 app.use('/api', companyRoutes);
-app.use('/api',  contactRoutes);
-app.use('/api',  rolesRoutes);
+app.use('/api', contactRoutes);
+app.use('/api', rolesRoutes);
 
 app.use(errorHandler);
 
