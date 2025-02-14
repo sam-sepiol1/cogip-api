@@ -65,7 +65,7 @@ export const logUser = async (req, res, next) => {
             throw new AuthenticationError('Invalid email or password');
         }
 
-        const token = jwt.sign({ user }, process.env.SECRET_KEY, { expiresIn: '7h' });
+        const token = jwt.sign({ user }, process.env.SECRET_KEY, { expiresIn: '4h' });
 
         return res.status(200).json({
             success: true,
@@ -87,16 +87,79 @@ export const authenticate = (req, res, next) => {
         const token = authHeader && authHeader.split(' ')[1];
 
         if (!token) {
-            throw new AuthenticationError('No token provided');
+            return res.status(401).json({
+                success: false,
+                error: {
+                    code: 'AUTHENTICATION_ERROR',
+                    message: 'No token provided',
+                    redirect: '/login'
+                }
+            });
         }
 
-        req.user = jwt.verify(token, process.env.SECRET_KEY);
-        next();
-    } catch (error) {
-        if (error.name === 'JsonWebTokenError') {
-            next(new AuthenticationError('Invalid token'));
-            return;
+        try {
+            req.user = jwt.verify(token, process.env.SECRET_KEY);
+            next();
+        } catch (error) {
+            return res.status(401).json({
+                success: false,
+                error: {
+                    code: 'AUTHENTICATION_ERROR',
+                    message: 'Invalid or expired token',
+                    redirect: '/login'
+                }
+            });
         }
-        next(new AuthenticationError('Authentication failed'));
+    } catch (error) {
+        return res.status(401).json({
+            success: false,
+            error: {
+                code: 'AUTHENTICATION_ERROR',
+                message: 'Authentication failed',
+                redirect: '/login'
+            }
+        });
+    }
+};
+
+export const checkAuthStatus = (req, res) => {
+    try {
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+
+        if (!token) {
+            return res.status(401).json({
+                success: false,
+                isAuthenticated: false,
+                message: "Utilisateur non connecté"
+            });
+        }
+
+        try {
+            const decoded = jwt.verify(token, process.env.SECRET_KEY);
+            return res.status(200).json({
+                success: true,
+                isAuthenticated: true,
+                user: {
+                    id: decoded.user.id,
+                    email: decoded.user.email,
+                    first_name: decoded.user.first_name,
+                    last_name: decoded.user.last_name,
+                    role_id: decoded.user.role_id
+                },
+                message: "Utilisateur connecté"
+            });
+        } catch (error) {
+            return res.status(401).json({
+                success: false,
+                isAuthenticated: false,
+                message: "Token invalide ou expiré"
+            });
+        }
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            error: "Erreur serveur lors de la vérification"
+        });
     }
 };
