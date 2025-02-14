@@ -1,4 +1,4 @@
-import { getAllUsers, updateUser, deleteUser } from '../models/userModel.js';
+import { getAllUsers, getUserById, updateUser, deleteUser } from '../models/userModel.js';
 
 export const getUsers = async (req, res) => {
     try {
@@ -13,6 +13,16 @@ export const getUsers = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+
+export const getUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const user = await getUserById(id);
+        res.status(200).json(user);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+}
 
 export const editUser = async (req, res) => {
     try {

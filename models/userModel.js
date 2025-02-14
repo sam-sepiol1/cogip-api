@@ -10,6 +10,15 @@ export const getAllUsers = async () => {
     }
 }
 
+export const getUserById = async (id) => {
+    try {
+        const [user] = await connexion.query('SELECT * FROM users WHERE id = ?', [id]);
+        return user[0];
+    } catch (error) {
+        console.log(error.message);
+    }
+}
+
 export const updateUser = async (id, first_name, last_name, role_id, email, password) => {
     const hashedPassword = await Bcrypt.hash(password, 8);
     const [result] = await connexion.query("UPDATE users SET first_name = ?, last_name = ?, role_id = ?, email = ?, password = ? WHERE id = ?", [ first_name, last_name, role_id, email, hashedPassword, id ]);
