@@ -89,7 +89,7 @@ This project is the backend API for the COGIP (Company Organization and General 
      npm start
      ```
 5. Run the front end: 
-   You can find the front end at 
+   You can find the front end at [https://github.com/sam-sepiol1/cogip-client]
 
 
 ## Credits 
